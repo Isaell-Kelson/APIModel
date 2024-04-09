@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  // Relacionamento com o modelo Evento
+  eventos Evento[] // Um usuário pode ter vários eventos associados a ele
+}
+
+// Definição do modelo Evento
+model Evento {
+  id        Int    @id @default(autoincrement())
+  categoria String
+
+  // Relacionamento com o modelo DiaSenha
+  dias   DiaSenha[] // Um evento pode ter vários dias e senhas associadas a ele
+  User   User?      @relation(fields: [userId], references: [id])
+  userId Int?
+}
+
+// Definição do modelo DiaSenha
+model DiaSenha {
+  id    Int    @id @default(autoincrement())
+  dia   String
+  senha String
+
+  // Relacionamento com o modelo Evento
+  evento   Evento @relation(fields: [eventoId], references: [id])
+  eventoId Int
+}
